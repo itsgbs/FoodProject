@@ -8,7 +8,7 @@ import Footer from "./Components/layout/Footer";
 import Menu from "./Components/Menu";
 import { loadUser } from "./redux/actions/userActions";
 import store from "./redux/store";
-import Login from "./components/user/Login";
+import Login from "./Components/user/Login";
 import Register from "./Components/user/Register";
 import Profile from "./Components/user/Profile";
 import UpdateProfile from "./Components/user/UpdateProfile";
