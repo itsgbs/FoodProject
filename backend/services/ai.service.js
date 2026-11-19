@@ -36,13 +36,17 @@ Return JSON in this EXACT format:
 }
 `;
 
-  const response = await axios.post(
+  let response;
+
+try {
+  response = await axios.post(
     "https://api.groq.com/openai/v1/chat/completions",
     {
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.4,
-      max_tokens: 300,
+      max_tokens: 700,
+        response_format: { type: "json_object" },
     },
     {
       headers: {
@@ -51,6 +55,26 @@ Return JSON in this EXACT format:
       },
     }
   );
+} catch (error) {
+  console.log("GROQ STATUS:", error.response?.status);
+  console.log("GROQ ERROR:", error.response?.data);
+  throw error;
+}
 
-  return JSON.parse(response.data.choices[0].message.content);
+  // return JSON.parse(response.data.choices[0].message.content);
+  const content = response.data.choices?.[0]?.message?.content;
+
+if (!content || !content.trim()) {
+  console.log("Groq returned empty content:", response.data);
+
+  throw new Error("Groq returned an empty response. Please try again.");
+}
+
+try {
+  return JSON.parse(content);
+} catch (error) {
+  console.log("Invalid JSON from Groq:", content);
+
+  throw new Error("Groq returned an invalid JSON response.");
+}
 };

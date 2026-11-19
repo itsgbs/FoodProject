@@ -79,61 +79,7 @@ exports.login = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-// Protect Route
-// exports.protect = catchAsyncErrors(async (req, res, next) => {
-
-//   let token;
-
-//   if (
-//     req.headers.authorization &&
-//     req.headers.authorization.startsWith("Bearer")
-//   ) {
-//     token = req.headers.authorization.split(" ")[1];
-//   } 
-//   else if (req.cookies.jwt) {
-//     token = req.cookies.jwt;
-//   }
-
-//   if (!token) {
-//     return next(
-//       new ErrorHandler(
-//         "You are not logged in! Please log in to get access.",
-//         401
-//       )
-//     );
-//   }
-
-//   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-//   const currentUser = await User.findById(decoded.id);
-
-// if (!currentUser) {
-//   return next(
-//     new ErrorHandler(
-//       "User no longer exists. Please login again.",
-//       401
-//     )
-//   );
-// }
-
-//   if (currentUser.changedPasswordAfter(decoded.iat)) {
-
-//     return next(
-//       new ErrorHandler(
-//         "User recently changed password ! please log in again.",
-//         404
-//       )
-//     );
-//   }
-
-//   req.user = currentUser;
-
-//   next();
-// });
-
 exports.protect = catchAsyncErrors(async (req, res, next) => {
-
-  console.log("1. PROTECT MIDDLEWARE REACHED");
 
   let token;
 
@@ -147,8 +93,6 @@ exports.protect = catchAsyncErrors(async (req, res, next) => {
     token = req.cookies.jwt;
   }
 
-  console.log("2. TOKEN CHECK:", !!token);
-
   if (!token) {
     return next(
       new ErrorHandler(
@@ -158,17 +102,36 @@ exports.protect = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  console.log("3. VERIFYING TOKEN");
-
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-  console.log("4. TOKEN VERIFIED");
+  const decoded = await promisify(jwt.verify)(
+    token,
+    process.env.JWT_SECRET
+  );
 
   const currentUser = await User.findById(decoded.id);
 
-  console.log("5. USER FOUND:", !!currentUser);
+  if (!currentUser) {
+    return next(
+      new ErrorHandler(
+        "User no longer exists. Please login again.",
+        401
+      )
+    );
+  }
 
-});// Keep the remaining original code unchanged.
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new ErrorHandler(
+        "User recently changed password! Please log in again.",
+        401
+      )
+    );
+  }
+
+  req.user = currentUser;
+
+  next();
+});
+// Keep the remaining original code unchanged.
 
 
 // Get profile
