@@ -2,9 +2,16 @@
 
 import axios from "axios";
 import qs from "qs";
-console.log("ENV:", import.meta.env.VITE_API_URL);
+// console.log("ENV:", import.meta.env.VITE_API_URL);
+// const api = axios.create({
+//   // baseURL: 'http://localhost:4000' + "/api", --- this is not possible for hosting 
+//   baseURL: (import.meta.env.VITE_API_URL || "http://localhost:4000") + "/api",
+//   withCredentials: true,
+//   paramsSerializer: (params) => qs.stringify(params, { arrayFormat: "repeat" }),
+// });
+
 const api = axios.create({
-  baseURL: 'http://localhost:4000' + "/api",
+  baseURL: (import.meta.env.VITE_API_URL || "http://localhost:4000") + "/api",
   withCredentials: true,
   paramsSerializer: (params) => qs.stringify(params, { arrayFormat: "repeat" }),
 });

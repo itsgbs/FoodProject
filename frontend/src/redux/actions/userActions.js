@@ -64,7 +64,7 @@ export const loadUser = () => async (dispatch) => {
 
     console.log("loadUser response:", data);
 
-    dispatch(loginSuccess(data.user));
+    dispatch(loginSuccess(data.data.user));
   } catch (error) {
     console.log("loadUser error:", error.response);
 
